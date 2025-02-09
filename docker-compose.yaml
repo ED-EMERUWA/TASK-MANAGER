@@ -1,0 +1,22 @@
+
+services:
+  edmysql:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_USER_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+    # volume for storing data even when container is closed
+      - ./data:/var/lib/mysql
+      # Mount the SQL file here/ ads the tables creation filel to the initiallization directory so it runs 
+      - ./DB_SCHEMA.sql:/docker-entrypoint-initdb.d/init.sql 
+    ports:
+      - "${DB_PORT}:3306"
+      
