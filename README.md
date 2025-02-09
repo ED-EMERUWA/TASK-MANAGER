@@ -1,2 +1,2 @@
 # TASK-MANAGER
-This repository contains all files for Ed Emeruwa's task manager app, including frontend, backend, and Docker setup.
+This repository contains all the essential files and folders necessary for the complete functionality of Ed Emeruwa's revolutionary task manager application. It includes the frontend and backend components, ensuring a seamless user experience and robust server-side operations. Additionally, the repository provides Docker Compose configurations and Dockerfiles, allowing for easy deployment and containerization of the application. Each section of this project is structured to facilitate efficient development, scalability, and maintainability, making it a comprehensive solution for task management.
