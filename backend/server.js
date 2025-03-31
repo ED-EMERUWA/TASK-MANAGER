@@ -8,6 +8,8 @@ import Role from "./models/Role.js";
 import cors from 'cors';
 import sequelize from "./configs/database.config.js";
 import "./models/association.js"
+import Task from "./models/Task.js";
+import tryMail from "./configs/mailer.config.js";
 const app = express();
 
 app.use(express.json()); // Replace bodyParser with built-in JSON middleware
@@ -111,7 +113,65 @@ app.post('/api/signup', async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+app.post('/api/tasks', async (req, res) => {
+  try {
+    const  userEmail  = req.body;
+    console.log('Request body:', req.body); // Better logging
+    console.log('Request body email :', userEmail); // Better logging
+
+    // Find user by email
+    const user = await User.findOne({ where: { email: userEmail.email } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' }); // Return a 404 if user doesn't exist
+    }
+
+    console.log('User found:', user);
+
+    // Fetch tasks assigned to the user
+    const tasks = await Task.findAll({ where: { Assignedto: user.id } });
+
+    console.log('Tasks found:', tasks);
+
+    res.json(tasks); // Send JSON response
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    res.status(500).json({ error: 'Internal Server Error' }); // Handle server errors
+  }
+});
+
+
+app.post('/api/addTask', async (req,res)=>{
+  const { Assignee, Topic, Body, AssignedTo } = req.body;
+  console.log(req.body);
+  
+  try {
+      // Use await to properly retrieve users
+      let boss = await User.findOne({ where: { email: Assignee } });
+      let emp = await User.findOne({ where: { email: AssignedTo } });
+  
+      if (boss && emp) {
+          console.log("Users found");
+  
+          // Ensure column names match your model (Assignedto should match exactly)
+          await Task.create({
+              Body,
+              Topic,
+              Assignedto: emp.id,  // Ensure field matches model
+              Assignee: boss.id
+          });
+  
+          res.status(201).json({ message: "Task created successfully" });
+      } else {
+          res.status(404).json({ message: "One or both users not found" });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
+  }
+  })
 // Start the server
-app.listen(PORT, () => {
+app.listen(PORT, () => {  
   console.log(`Server is running on http://localhost:${PORT}`);
 });

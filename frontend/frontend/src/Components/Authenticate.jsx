@@ -6,7 +6,6 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
 
-
   const login = async (credentials) => {
     try {
       const response = await fetch(`http://localhost:2173/api/login`, {
@@ -59,11 +58,13 @@ export const UserProvider = ({ children }) => {
   };
 
   const signup = async (credentials) => {
-    response = await fetch(`http://localhost:2173/api/signup`, {
+    let response = await fetch(`http://localhost:2173/api/signup`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials)  
     })
+
+    return response.json();
   };
 
   useEffect(() => {

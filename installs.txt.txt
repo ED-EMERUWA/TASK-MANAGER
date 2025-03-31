@@ -1,0 +1,4 @@
+expo install expo-gl
+visual studio
+python
+flutter

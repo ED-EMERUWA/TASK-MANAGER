@@ -47,7 +47,7 @@ ENGINE = InnoDB;
 -- Table `user_management_db`.`Task`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `user_management_db`.`Task` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `Body` VARCHAR(45) NOT NULL,
   `Assignee` INT NOT NULL,
   `AssignedTo` INT NOT NULL,

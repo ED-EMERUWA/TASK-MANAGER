@@ -1,2 +1,41 @@
-# TASK-MANAGER
-This repository contains all the essential files and folders necessary for the complete functionality of Ed Emeruwa's revolutionary task manager application. It includes the frontend and backend components, ensuring a seamless user experience and robust server-side operations. Additionally, the repository provides Docker Compose configurations and Dockerfiles, allowing for easy deployment and containerization of the application. Each section of this project is structured to facilitate efficient development, scalability, and maintainability, making it a comprehensive solution for task management.
+Here's a cleaned-up and more structured version of your markdown file, ensuring clarity and correctness while following your instructions:  
+
+---
+
+# **TASK-MANAGER**  
+This repository contains all the necessary files and folders for **Ed Emeruwa's Task Manager**—a powerful and efficient task management application. It includes both **frontend** and **backend** components, ensuring a smooth user experience alongside robust server-side operations.  
+
+Additionally, the repository provides **Docker Compose configurations** and **Dockerfiles** for easy deployment and containerization. Each section of the project is designed with scalability, maintainability, and efficient development in mind, making it a comprehensive solution for task management.  
+
+---
+
+## **Running the Application**  
+Follow these steps to set up and run the Task Manager locally:  
+
+### **1. Clone the Repository**  
+```sh
+git clone <repository-url>
+cd task-manager
+```
+
+### **2. Start Services with Docker**  
+Ensure you have **[Docker](https://www.docker.com/)** installed and running.  
+In the base directory, start the containers:  
+```sh
+docker compose up
+```
+
+### **3. Start the Backend**  
+Navigate to the backend directory and start the server:  
+```sh
+cd backend
+npm start
+```
+
+### **4. Start the Frontend**  
+Navigate to the frontend directory and run the development server:  
+```sh
+cd frontend/frontend
+npm run dev
+```
+
