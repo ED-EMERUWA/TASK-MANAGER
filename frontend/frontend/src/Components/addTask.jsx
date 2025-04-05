@@ -7,7 +7,7 @@ export default function AddTask() {
   const { user, logout } = useAuth(); 
   console.log(user)
   const [newTask, setNewTask] = useState({
-    Assignee: user.email,
+    Assignee: user?.email || "",
     Topic: "",
     Body: "",
     AssignedTo: "waed@gmail.com"

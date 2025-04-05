@@ -1,26 +1,25 @@
-import { useContext, useState } from "react";
-import { userContext } from "./Authenticate"; // Adjust the path
-import { useAuth } from "./Authenticate"; // Updated import
+import { useState } from "react";
+import { useAuth } from "./Authenticate"; // Import the useAuth hook
+import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
 
 export default function Login() {
-  const { login, logout } = useAuth(); // Use the new hook
+  const { login } = useAuth(); // Use the login function from context
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const navigate = useNavigate(); // Initialize the navigate function
 
   const handleLogin = async () => {
     try {
-      await login(credentials);
+      await login(credentials); // Call the login function from context
       
-      
+      // If login is successful, redirect to the dashboard page
+      navigate("/dashboard"); // Redirect to /dashboard
     } catch (error) {
       console.error(`Login failed: ${error}`);
       alert("Login failed!");
     }
   };
-
   const handleLogout = () => {
-    logout()
-    
-  }
+    logout()}
 
   return (
     <div>

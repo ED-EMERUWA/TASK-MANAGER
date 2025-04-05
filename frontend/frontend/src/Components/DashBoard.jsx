@@ -1,11 +1,25 @@
 import { useState, useEffect } from "react"; 
 import { useAuth } from "./Authenticate"; // Import useAuth to access user data
+import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
+
 
 export default function Dashboard() {
-  const { user } = useAuth(); // Get user from context
+  const { user, loading } = useAuth(); // Get user from context
   const [tasks, setTasks] = useState([]);
+  const navigate = useNavigate(); // Initialize the navigate function
 
+
+  
   useEffect(() => {
+
+    if (loading) return; // 🔄 Wait for auth check to finish
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    
+
     const fetchTasks = async () => {
       if (!user || !user.email) return; // Ensure user is available
 
@@ -40,7 +54,9 @@ export default function Dashboard() {
     }, 1000); // Refresh tasks every 1 seconds (adjust as needed)
 
     return () => clearTimeout(refreshTimeout); // Cleanup timeout on unmount
-  }, [user]); // Depend on user so it runs when user changes
+
+ 
+  }, [user,loading]); // Depend on user so it runs when user changes
 
   return (
     <div>
