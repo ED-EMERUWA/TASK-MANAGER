@@ -1,47 +1,98 @@
-import sequelize from "../configs/database.config.js";
-import {Model, DataTypes} from 'sequelize';
-import User from "./User.js";
+import { Model, DataTypes } from "sequelize"; // Import Model and DataTypes
+import sequelize from "../configs/database.config.js"; // Import created Sequelize instance
 
-class Task extends  Model {};
+class Task extends Model {}
 
-Task.init({
-    id:{
-        type : DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        allowNull: false
+Task.init(
+  {
+    id: {
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
     },
-    Body:
-    {
-        type: DataTypes.STRING,
-        allowNull: true,
-
+    Body: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
     },
-    Topic:{
-        type: DataTypes.STRING,
-        allowNull: false
+    Assignee: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'User',
+        key: 'id',
+      },
     },
-    Assignee:{
-        type : DataTypes.INTEGER,
-        references:{
-            model: User,
-            key : 'id'
-        }
+    AssignedTo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'User',
+        key: 'id',
+      },
     },
-    Assignedto:{
-        type: DataTypes.INTEGER,
-        references:{
-            model:User,
-            key:'id'
-        }
-    }
+    Topic: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    AssignedDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    DueDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    CompletedDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    completed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    completedNote: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    org_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Org',
+        key: 'id',
+      },
+    },
+  },
+  {
+    sequelize,
+    tableName: 'Task',
+    timestamps: false,
+    indexes: [
+      {
+        name: "PRIMARY",
+        unique: true,
+        using: "BTREE",
+        fields: [{ name: "id" }],
+      },
+      {
+        name: "Assignee_idx",
+        using: "BTREE",
+        fields: [{ name: "Assignee" }],
+      },
+      {
+        name: "AssignedTo_idx",
+        using: "BTREE",
+        fields: [{ name: "AssignedTo" }],
+      },
+      {
+        name: "org_id_idx",
+        using: "BTREE",
+        fields: [{ name: "org_id" }],
+      },
+    ],
+  }
+);
 
-},
-{
-  sequelize,
-  tableName: 'Task', // Specify the exact table name
-  timestamps: false, // Disable timestamps if not needed
-})
-
-// Export the Program model for use in other parts of the application
 export default Task;

@@ -1,45 +1,29 @@
-// App.jsx
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./Components/Authenticate.jsx";
 import PrivateRoute from "./Components/PrivateRoute"; // Import the PrivateRoute component
-import Home from './Components/Home';
-import Login from './Components/Login';
-import Signup from './Components/Signup';
-import AddTask from './Components/addTask';
-import Dashboard from './Components/Dashboard';
-
+import Header from "./Components/Header"; // Import the Header component
+import Home from "./Components/Home.jsx";
+import Login from "./Components/Login";
+import Signup from "./Components/Signup";
+import AddTask from "./Components/addTask";
+import Dashboard from "./Components/Dashboard";
+import CompletedTasks from "./Components/completedTasks.jsx";
+import Profile from "./Components/profile.jsx";
+import AssignedTasks from "./components/assignedTasks.jsx"; // The AssignedTasks component
 
 function App() {
   return (
     <UserProvider>
       <Router>
+        {/* Add the Header here, so it appears on all pages */}
+        <Header />
+
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/" element={<Home />} />
-          {/* none protectd route */}
+          {/* Protected routes */}
           <Route
-            path="/dashboard"
-            element={
-            
-              <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          
-            }
-          />
-           <Route
-            path="/add-task"
-            element={
-              <PrivateRoute>
-                <AddTask />
-                </PrivateRoute>
-             
-            }
-          />
-          
-          {/* Protect the dashboard route */}
-          {/* <Route
             path="/dashboard"
             element={
               <PrivateRoute>
@@ -47,14 +31,39 @@ function App() {
               </PrivateRoute>
             }
           />
-           <Route
+
+          <Route
+            path="/assigned-tasks"
+            element={
+              <PrivateRoute>
+                <AssignedTasks />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/add-task"
             element={
               <PrivateRoute>
                 <AddTask />
               </PrivateRoute>
             }
-          /> */}
+          />
+          <Route
+            path="/completed"
+            element={
+              <PrivateRoute>
+                <CompletedTasks />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </Router>
     </UserProvider>
