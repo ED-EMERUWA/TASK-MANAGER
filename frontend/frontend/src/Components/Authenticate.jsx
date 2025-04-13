@@ -21,6 +21,7 @@ export const UserProvider = ({ children }) => {
       }
 
       const data = await response.json();
+      console.log("Bare data",data)
 
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -40,6 +41,7 @@ export const UserProvider = ({ children }) => {
           };
 
           setUser(userData);
+          console.log(userData)
           alert("Login successful!");
 
           

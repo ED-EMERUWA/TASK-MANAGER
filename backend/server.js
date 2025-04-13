@@ -11,6 +11,11 @@ import "./models/association.js"
 import Task from "./models/Task.js";
 import Org from './models/Org.js'
 import tryMail from "./configs/mailer.config.js";
+
+
+
+// api endpoint
+
 const app = express();
 
 app.use(express.json()); // Replace bodyParser with built-in JSON middleware
@@ -18,6 +23,8 @@ app.use(cors());
 
 const PORT = process.env.SERVER_PORT || 2173; // Define the port
 const SECRET_KEY = process.env.SECRET_KEY || "your-secret-key";
+
+
 
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
@@ -54,10 +61,18 @@ app.post("/api/login", async (req, res) => {
     const permissions = rolePermissions.map((rp) => rp.Permission.name);
     console.log("Parsed permissions:", permissions); // Log parsed permissions
 
+    const roleName = await Role.findOne({
+      where: { id: user.role },
+      attributes: ['name'],  // assuming 'name' is the field holding the role name
+    });
+    console.log("raga:",roleName.name)
+
+
     // Step 4: Generate token
     const username = `${user.firstName} ${user.lastName}`;
+    
     const token = jwt.sign(
-      { name: username, email: user.email, role: user.role, permissions },
+      { username: username, email: user.email, role: roleName, permissions },
       SECRET_KEY,
       { expiresIn: "1h" }
     );
@@ -276,30 +291,50 @@ console.log("Could not get organizations ", error.e)
       console.error("Error getting contacts:", error);
       res.status(500).json({ message: "Internal server error" });
     }
-  });
-
-  app.post('/api/assignedTasks', async (req, res) => {
+  });app.post('/api/assignedTasks', async (req, res) => {
     const { email } = req.body;
   
     try {
       const user = await User.findOne({ where: { email } });
   
-      if (!user) return res.status(404).json({ message: "User not found" });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
   
-      const completedTasks = await Task.findAll({
-        where: {
-          Assignee: user.id,
-        },
-        order: [['CompletedDate', 'DESC']]
+      const tasks = await Task.findAll({
+        where: { AssignedTo: user.id }, // fetch tasks assigned *to* the user
+        include: [
+          { model: User, as: 'AssigneeDetails', attributes: ['id', 'firstName'] },
+          { model: User, as: 'AssignedToDetails', attributes: ['id', 'firstName', 'lastName', ] }
+        ]
+      
       });
   
-      res.json(completedTasks);
+      res.json(tasks);
     } catch (error) {
-      console.error("Error fetching completed tasks:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error('Error fetching tasks:', error);
+      res.status(500).json({ error: 'Failed to fetch tasks' });
     }
   });
-    
+
+  app.delete('/api/delete', async (req, res) => {
+    const taskId = req.body;
+    console.log(taskId)
+    try {
+      const deleted = await Task.destroy({ where: { id: taskId.id } });
+  
+      if (deleted) {
+        res.status(200).json({ message: "Task deleted successfully." });
+      } else {
+        res.status(404).json({ message: "Task not found." });
+      }
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      res.status(500).json({ message: "Internal server error." });
+    }
+  });
+  
+      
 // Start the server
 app.listen(PORT, () => {  
   console.log(`Server is running on http://localhost:${PORT}`);

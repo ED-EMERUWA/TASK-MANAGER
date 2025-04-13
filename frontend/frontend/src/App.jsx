@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./Components/Authenticate.jsx";
 import PrivateRoute from "./Components/PrivateRoute"; // Import the PrivateRoute component
-import Header from "./Components/Header"; // Import the Header component
+// import Header from "./Components/Header"; // Import the Header component
 import Home from "./Components/Home.jsx";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
@@ -10,18 +10,22 @@ import Dashboard from "./Components/Dashboard";
 import CompletedTasks from "./Components/completedTasks.jsx";
 import Profile from "./Components/profile.jsx";
 import AssignedTasks from "./components/assignedTasks.jsx"; // The AssignedTasks component
+import Contact from "./components/Contact.jsx";
+// import About from "./components/About.jsx";
 
 function App() {
   return (
     <UserProvider>
       <Router>
         {/* Add the Header here, so it appears on all pages */}
-        <Header />
+        {/* <Header /> */}
 
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/" element={<Home />} />
+          {/* <Route path="/about" element={<About />} /> */}
+          <Route path="/contact" element={<Contact />} />
           {/* Protected routes */}
           <Route
             path="/dashboard"

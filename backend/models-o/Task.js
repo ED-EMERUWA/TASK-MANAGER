@@ -1,66 +1,71 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Task', {
+import { Model, DataTypes } from "sequelize"; // Import Model and DataTypes
+import sequelize from "../configs/database.config.js"; // Import created Sequelize instance
+
+class Task extends Model {}
+
+Task.init(
+  {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
     },
     Body: {
       type: DataTypes.STRING(45),
-      allowNull: false
+      allowNull: false,
     },
     Assignee: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'User',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     AssignedTo: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'User',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     Topic: {
       type: DataTypes.STRING(45),
-      allowNull: false
+      allowNull: false,
     },
     AssignedDate: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     DueDate: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     CompletedDate: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     completed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: false,
     },
     completedNote: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
     },
     org_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'Org',
-        key: 'id'
-      }
-    }
-  }, {
+        key: 'id',
+      },
+    },
+  },
+  {
     sequelize,
     tableName: 'Task',
     timestamps: false,
@@ -69,31 +74,25 @@ module.exports = function(sequelize, DataTypes) {
         name: "PRIMARY",
         unique: true,
         using: "BTREE",
-        fields: [
-          { name: "id" },
-        ]
+        fields: [{ name: "id" }],
       },
       {
         name: "Assignee_idx",
         using: "BTREE",
-        fields: [
-          { name: "Assignee" },
-        ]
+        fields: [{ name: "Assignee" }],
       },
       {
         name: "AssignedTo_idx",
         using: "BTREE",
-        fields: [
-          { name: "AssignedTo" },
-        ]
+        fields: [{ name: "AssignedTo" }],
       },
       {
         name: "org_id_idx",
         using: "BTREE",
-        fields: [
-          { name: "org_id" },
-        ]
+        fields: [{ name: "org_id" }],
       },
-    ]
-  });
-};
+    ],
+  }
+);
+
+export default Task;

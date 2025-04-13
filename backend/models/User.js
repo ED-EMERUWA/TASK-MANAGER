@@ -22,6 +22,7 @@ User.init(
     email: {
       type: DataTypes.STRING(45),
       allowNull: false,
+      unique: true, // Make email unique
     },
     role: {
       type: DataTypes.INTEGER,
@@ -65,6 +66,12 @@ User.init(
         name: "org_idx",
         using: "BTREE",
         fields: ["org_id"],
+      },
+      {
+        name: "email_unique_idx", // Optional named index for uniqueness
+        unique: true,
+        using: "BTREE",
+        fields: ["email"],
       },
     ],
   }
