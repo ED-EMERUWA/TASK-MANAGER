@@ -1,45 +1,22 @@
 import { Model, DataTypes } from "sequelize"; // Import Model and DataTypes
-<<<<<<< HEAD
-import sequelize from "../configs/database.config.js"; // IMport creted seqeulize instance
-=======
 import sequelize from "../configs/database.config.js"; // Import created Sequelize instance
 
->>>>>>> master
 class Role extends Model {}
 
 Role.init(
   {
     id: {
       type: DataTypes.INTEGER,
-<<<<<<< HEAD
-      primaryKey: true,
-      allowNull: false,
-      autoIncrement: true, // Recommended for primary keys
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-=======
       allowNull: false,
       primaryKey: true,
     },
     name: {
       type: DataTypes.STRING(45),
       allowNull: true,
->>>>>>> master
     },
   },
   {
     sequelize,
-<<<<<<< HEAD
-    modelName: "Role", // Add this to avoid issues with model references
-    tableName: "Role",
-    timestamps: false,
-  }
-);
-
-export default Role
-=======
     tableName: 'Role',
     timestamps: false,
     indexes: [
@@ -54,4 +31,3 @@ export default Role
 );
 
 export default Role;
->>>>>>> master

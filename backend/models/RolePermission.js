@@ -1,12 +1,5 @@
-<<<<<<< HEAD
-import sequelize from "../configs/database.config.js";
-import { Model, DataTypes } from "sequelize";
-import Permission from "./Permission.js";
-import Role from "./Role.js";
-=======
 import { Model, DataTypes } from "sequelize"; // Import Model and DataTypes
 import sequelize from "../configs/database.config.js"; // Import created Sequelize instance
->>>>>>> master
 
 class RolePermission extends Model {}
 
@@ -14,44 +7,25 @@ RolePermission.init(
   {
     role_id: {
       type: DataTypes.INTEGER,
-<<<<<<< HEAD
-      primaryKey: true,
-      allowNull: false,
-      references: {
-        model: Role,
-        key: "id",
-=======
       allowNull: false,
       primaryKey: true,
       references: {
         model: 'Role',
         key: 'id',
->>>>>>> master
       },
     },
     permission_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-<<<<<<< HEAD
-      references: {
-        model: Permission, // Reference the actual model
-        key: "id",
-=======
       primaryKey: true,
       references: {
         model: 'Permission',
         key: 'id',
->>>>>>> master
       },
     },
   },
   {
     sequelize,
-<<<<<<< HEAD
-    modelName: "RolePermission",
-    tableName: "RolePermission",
-    timestamps: false,
-=======
     tableName: 'RolePermission',
     timestamps: false,
     indexes: [
@@ -70,7 +44,6 @@ RolePermission.init(
         fields: [{ name: "permission_id" }],
       },
     ],
->>>>>>> master
   }
 );
 

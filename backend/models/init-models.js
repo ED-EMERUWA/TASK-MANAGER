@@ -1,11 +1,4 @@
 var DataTypes = require("sequelize").DataTypes;
-<<<<<<< HEAD
-
-function initModels(sequelize) {
-
-
-  return {
-=======
 var _Org = require("./Org");
 var _Permission = require("./Permission");
 var _Role = require("./Role");
@@ -45,7 +38,6 @@ function initModels(sequelize) {
     RolePermission,
     Task,
     User,
->>>>>>> master
   };
 }
 module.exports = initModels;
