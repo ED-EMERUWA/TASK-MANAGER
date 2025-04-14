@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./components/Authenticate.jsx";
-import PrivateRoute from "./Components/PrivateRoute"; // Import the PrivateRoute component
+import PrivateRoute  from "./components/PrivateRoute"; // Import the PrivateRoute component
 // import Header from "./Components/Header"; // Import the Header component
 import Home from "../src/Components/Home.jsx";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
-import AddTask from "./Components/addTask";
+import AddTask from "./components/addTask.jsx";
 import Dashboard from "./Components/Dashboard";
 import CompletedTasks from "./Components/completedTasks.jsx";
 import Profile from "./Components/profile.jsx";
