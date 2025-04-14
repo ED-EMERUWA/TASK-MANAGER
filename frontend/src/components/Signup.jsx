@@ -12,6 +12,8 @@ export default function Signup() {
   const [signedIn, setSignedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState("");
+
 
 
   const [formData, setFormData] = useState({
@@ -48,7 +50,7 @@ export default function Signup() {
 
   const validateForm = () => {
     const { firstName, lastName, password, role, userOrg } = formData;
-
+  
     if (firstName.trim().length < 2) {
       return "First name must be at least 2 characters.";
     }
@@ -61,25 +63,29 @@ export default function Signup() {
     if (!/\d/.test(password)) {
       return "Password must contain at least one number.";
     }
+    if (password !== confirmPassword) {
+      return "Passwords do not match.";
+    }
     if (!role) {
       return "Please select a role.";
     }
     if (!userOrg) {
       return "Please select an organization.";
     }
-
+  
     return null;
   };
-
+  
   const handleSignup = async (e) => {
     e.preventDefault();
     setError(null);
 
     const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
+  if (validationError) {
+    setError(validationError);
+    window.scrollTo(0, 0); // Scroll to top on validation error
+    return;
+  }
 
     setLoading(true);
     try {
@@ -202,6 +208,15 @@ export default function Signup() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="w-full px-4 py-3 bg-[#111111] border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1DCD9F] outline-none"
             />
+
+<input
+  type="password"
+  placeholder="Confirm Password"
+  value={confirmPassword}
+  onChange={(e) => setConfirmPassword(e.target.value)}
+  className="w-full px-4 py-3 bg-[#111111] border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1DCD9F] outline-none"
+/>
+
 
             <button
               type="submit"
