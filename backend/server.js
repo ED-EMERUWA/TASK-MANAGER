@@ -9,7 +9,17 @@ import cors from 'cors';
 import sequelize from "./configs/database.config.js";
 import "./models/association.js"
 import Task from "./models/Task.js";
+<<<<<<< HEAD
 import tryMail from "./configs/mailer.config.js";
+=======
+import Org from './models/Org.js'
+import tryMail from "./configs/mailer.config.js";
+
+
+
+// api endpoint
+
+>>>>>>> master
 const app = express();
 
 app.use(express.json()); // Replace bodyParser with built-in JSON middleware
@@ -18,6 +28,11 @@ app.use(cors());
 const PORT = process.env.SERVER_PORT || 2173; // Define the port
 const SECRET_KEY = process.env.SECRET_KEY || "your-secret-key";
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> master
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   console.log("Incoming login request:", { email }); // Log request details
@@ -44,18 +59,40 @@ app.post("/api/login", async (req, res) => {
 
     // Step 3: Fetch permissions
     const rolePermissions = await RolePermission.findAll({
+<<<<<<< HEAD
       where: { role_id: user.role }, // Match user's role
       include: [{ model: Permission, attributes: ["name"] }],
     });
+=======
+      where: { role_id: user.role },
+      include: [{ model: Permission, as: 'Permission', attributes: ["name"] }],
+    });
+    
+>>>>>>> master
     console.log("Role permissions fetched:", rolePermissions); // Log permissions
 
     const permissions = rolePermissions.map((rp) => rp.Permission.name);
     console.log("Parsed permissions:", permissions); // Log parsed permissions
 
+<<<<<<< HEAD
     // Step 4: Generate token
     const username = `${user.firstName} ${user.lastName}`;
     const token = jwt.sign(
       { name: username, email: user.email, role: user.role, permissions },
+=======
+    const roleName = await Role.findOne({
+      where: { id: user.role },
+      attributes: ['name'],  // assuming 'name' is the field holding the role name
+    });
+    console.log("raga:",roleName.name)
+
+
+    // Step 4: Generate token
+    const username = `${user.firstName} ${user.lastName}`;
+    
+    const token = jwt.sign(
+      { username: username, email: user.email, role: roleName, permissions },
+>>>>>>> master
       SECRET_KEY,
       { expiresIn: "1h" }
     );
@@ -69,7 +106,12 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post('/api/signup', async (req, res) => {
+<<<<<<< HEAD
   const { firstName, lastName, email, role, password } = req.body;  
+=======
+
+  const { firstName, lastName, email, role, password, userOrg } = req.body;  
+>>>>>>> master
   console.log(`Signup form recieved at the backend ${req.body}`)
 
   try {
@@ -84,16 +126,35 @@ app.post('/api/signup', async (req, res) => {
       return res.status(400).json({ message: "Role not found" });
     }
 
+<<<<<<< HEAD
     // Step 3: Get the role_id from the roleRecord
     const role_id = roleRecord.id;
 
+=======
+    // Step 3: Get the role_id from the roleRecord and identify the organization
+    const role_id = roleRecord.id;
+    const org = await Org.findOne({
+      where: { id: userOrg },
+      attributes: ['id'], // Only fetch the `id`
+    });
+
+    console.log("user org",userOrg)
+    
+    const org_id = org ? org.id : null;
+    
+>>>>>>> master
     // Step 4: Create the user in the User model
     const newUser = await User.create({
       firstName,
       lastName,
       email,
       role: role_id, // Use the role_id
+<<<<<<< HEAD
       password: hashedPassword // Store the hashed password
+=======
+      password: hashedPassword, // Store the hashed password
+      org_id : org_id
+>>>>>>> master
     });
 
     res.status(201).json({
@@ -130,7 +191,12 @@ app.post('/api/tasks', async (req, res) => {
     console.log('User found:', user);
 
     // Fetch tasks assigned to the user
+<<<<<<< HEAD
     const tasks = await Task.findAll({ where: { Assignedto: user.id } });
+=======
+    const tasks = await Task.findAll({ where: { Assignedto: user.id,  org_id: user.org_id,
+      completed: false } });
+>>>>>>> master
 
     console.log('Tasks found:', tasks);
 
@@ -141,6 +207,7 @@ app.post('/api/tasks', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 
 app.post('/api/addTask', async (req,res)=>{
   const { Assignee, Topic, Body, AssignedTo } = req.body;
@@ -171,6 +238,174 @@ app.post('/api/addTask', async (req,res)=>{
       res.status(500).json({ message: "Server error" });
   }
   })
+=======
+app.post('/api/addTask', async (req, res) => {
+  const { Assignee, Topic, Body, AssignedTo, AssignedDate, DueDate } = req.body;
+  console.log("Incoming task data:", req.body);
+
+  try {
+    // Find both users by email
+    const boss = await User.findOne({ where: { email: Assignee } });
+    const emp = await User.findOne({ where: { email: AssignedTo } });
+
+    if (!boss || !emp) {
+      return res.status(404).json({ message: "Assignee or AssignedTo user not found" });
+    }
+
+    // Create the task with the org_id from the Assignee (boss)
+    await Task.create({
+      Body,
+      Topic,
+      Assignee: boss.id,
+      AssignedTo: emp.id,
+      AssignedDate: AssignedDate ? new Date(AssignedDate) : new Date(),
+      DueDate: DueDate ? new Date(DueDate) : null,
+      org_id: boss.org_id,
+    });
+
+    res.status(201).json({ message: "Task created successfully" });
+
+  } catch (error) {
+    console.error("Error adding task:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+  app.get('/api/orgs', async (req,res)=>{
+    try{
+      const fetchedOrg = await Org.findAll()
+      res.json(fetchedOrg)
+    }
+    catch (e){
+console.log("Could not get organizations ", error.e)
+    }
+  })
+
+
+
+
+  app.put('/api/updatetasks', async (req, res) => {
+    const { email, task_id, completedNote } = req.body;
+  
+    if (!task_id || completedNote === undefined) {
+      return res.status(400).json({ error: 'Missing task_id or completedNote' });
+    }
+  
+    try {
+      const [updated] = await Task.update(
+        {
+          completedNote: completedNote,
+          CompletedDate: new Date(),
+          completed: true,
+        },
+        {
+          where: {
+            id: task_id,
+          },
+        }
+      );
+  
+      if (updated === 0) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+  
+    } catch (error) {
+      console.error('Error updating task:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/completedtasks', async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const user = await User.findOne({ where: { email } });
+  
+      if (!user) return res.status(404).json({ message: "User not found" });
+  
+      const completedTasks = await Task.findAll({
+        where: {
+          AssignedTo: user.id,
+          completed: true
+        },
+        order: [['CompletedDate', 'DESC']]
+      });
+  
+      res.json(completedTasks);
+    } catch (error) {
+      console.error("Error fetching completed tasks:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  app.post('/api/getContacts', async (req, res) => {
+    const { email } = req.body; // Get email from the body of the request
+    
+    try {
+      // Find the user by email
+      const user = await User.findOne({ where: { email } });
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Find all contacts within the same organization as the user
+      const contacts = await User.findAll({ where: { org_id: user.org_id } });
+  
+      if (!contacts || contacts.length === 0) {
+        return res.status(404).json({ message: "No contacts found" });
+      }
+  
+      // Return the contacts
+      res.json(contacts);
+    } catch (error) {
+      console.error("Error getting contacts:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });app.post('/api/assignedTasks', async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const user = await User.findOne({ where: { email } });
+  
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      const tasks = await Task.findAll({
+        where: { AssignedTo: user.id }, // fetch tasks assigned *to* the user
+        include: [
+          { model: User, as: 'AssigneeDetails', attributes: ['id', 'firstName'] },
+          { model: User, as: 'AssignedToDetails', attributes: ['id', 'firstName', 'lastName', ] }
+        ]
+      
+      });
+  
+      res.json(tasks);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      res.status(500).json({ error: 'Failed to fetch tasks' });
+    }
+  });
+
+  app.delete('/api/delete', async (req, res) => {
+    const taskId = req.body;
+    console.log(taskId)
+    try {
+      const deleted = await Task.destroy({ where: { id: taskId.id } });
+  
+      if (deleted) {
+        res.status(200).json({ message: "Task deleted successfully." });
+      } else {
+        res.status(404).json({ message: "Task not found." });
+      }
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      res.status(500).json({ message: "Internal server error." });
+    }
+  });
+  
+      
+>>>>>>> master
 // Start the server
 app.listen(PORT, () => {  
   console.log(`Server is running on http://localhost:${PORT}`);
