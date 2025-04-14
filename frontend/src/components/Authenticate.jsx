@@ -10,7 +10,7 @@ export const UserProvider = ({ children }) => {
   // Login function (as you've already defined)
   const login = async (credentials) => {
     try {
-      const response = await fetch(`http://localhost:2173/api/login`, {
+      const response = await fetch(`https://task-flow-backend-bc30.onrender.com/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -60,7 +60,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const signup = async (credentials) => {
-    let response = await fetch(`http://localhost:2173/api/signup`, {
+    let response = await fetch(`https://task-flow-backend-bc30.onrender.com/api/signup`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials)  
@@ -141,7 +141,7 @@ export const useAuth = () => {
 
 //   const login = async (credentials) => {
 //     try {
-//       const response = await fetch(`http://localhost:2173/api/login`, {
+//       const response = await fetch(`https://task-flow-backend-bc30.onrender.com/api/login`, {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(credentials),
@@ -192,7 +192,7 @@ export const useAuth = () => {
 //   };
 
   // const signup = async (credentials) => {
-  //   let response = await fetch(`http://localhost:2173/api/signup`, {
+  //   let response = await fetch(`https://task-flow-backend-bc30.onrender.com/api/signup`, {
   //     method: 'POST',
   //     headers: { "Content-Type": "application/json" },
   //     body: JSON.stringify(credentials)  

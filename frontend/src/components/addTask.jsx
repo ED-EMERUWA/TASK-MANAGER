@@ -38,7 +38,7 @@ export default function AddTask() {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await fetch("http://localhost:2173/api/getContacts", {
+        const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/getContacts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export default function AddTask() {
         DueDate: newTask.DueDate ? toMySQLDatetime(newTask.DueDate) : null,
       };
 
-      const response = await fetch("http://localhost:2173/api/addTask", {
+      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/addTask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskToSend),

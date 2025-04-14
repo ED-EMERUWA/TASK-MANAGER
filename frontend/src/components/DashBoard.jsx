@@ -19,7 +19,7 @@ export default function Dashboard() {
     if (!user) return;
 
     try {
-      const response = await fetch("http://localhost:2173/api/tasks", {
+      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email }),
@@ -63,7 +63,7 @@ export default function Dashboard() {
 
   const handleComplete = async (taskId, note) => {
     try {
-      const response = await fetch("http://localhost:2173/api/updatetasks", {
+      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/updatetasks", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -98,7 +98,7 @@ export default function Dashboard() {
     if (!confirmDelete) return;
   
     try {
-      const res = await fetch(`http://localhost:2173/api/delete`, {
+      const res = await fetch(`https://task-flow-backend-bc30.onrender.com/api/delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"
