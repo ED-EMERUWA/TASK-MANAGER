@@ -302,7 +302,7 @@ console.log("Could not get organizations ", error.e)
       }
   
       const tasks = await Task.findAll({
-        where: { AssignedTo: user.id }, // fetch tasks assigned *to* the user
+        where: { Assignee: user.id }, // fetch tasks assigned *to* the user
         include: [
           { model: User, as: 'AssigneeDetails', attributes: ['id', 'firstName'] },
           { model: User, as: 'AssignedToDetails', attributes: ['id', 'firstName', 'lastName', ] }
