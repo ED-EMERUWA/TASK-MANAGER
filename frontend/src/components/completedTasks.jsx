@@ -27,7 +27,7 @@ export default function CompletedTasks() {
   useEffect(() => {
     const fetchCompletedTasks = async () => {
       try {
-        const response = await fetch("http://localhost:2173/api/completedtasks", {
+        const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/completedtasks", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user?.email }),
@@ -52,7 +52,7 @@ export default function CompletedTasks() {
     if (!confirmDelete) return;
   
     try {
-      const res = await fetch(`http://localhost:2173/api/delete`, {
+      const res = await fetch(`https://task-flow-backend-bc30.onrender.com/api/delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"

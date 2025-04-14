@@ -26,7 +26,7 @@ export default function Signup() {
   useEffect(() => {
     const fetchOrgs = async () => {
       try {
-        const response = await fetch("http://localhost:2173/api/orgs");
+        const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/orgs");
         if (!response.ok) {
           throw new Error(`Failed to get organizations: ${response.status}`);
         }

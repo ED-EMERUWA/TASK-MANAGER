@@ -27,7 +27,7 @@ export default function AssignedTasks() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("http://localhost:2173/api/assignedTasks", {
+        const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/assignedTasks", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user?.email }),
