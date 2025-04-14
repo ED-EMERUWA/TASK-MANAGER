@@ -157,7 +157,7 @@ export default function AssignedTasks() {
                             : "Unknown User"}
                         </p>
                         <p className={`text-sm ${task.CompletedDate ? "text-emerald-400" : "text-gray-400"}`}>
-                          <strong>Status:</strong> {task.CompletedDate ? "Completed" : "Pending"}
+                          <strong>Status:</strong> {task.Completed ? "Completed" : "Pending"}
                         </p>
                       </div>
                       <div className="text-xs md:text-sm text-gray-400">
