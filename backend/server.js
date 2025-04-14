@@ -9,9 +9,6 @@ import cors from 'cors';
 import sequelize from "./configs/database.config.js";
 import "./models/association.js"
 import Task from "./models/Task.js";
-<<<<<<< HEAD
-import tryMail from "./configs/mailer.config.js";
-=======
 import Org from './models/Org.js'
 import tryMail from "./configs/mailer.config.js";
 
@@ -19,7 +16,6 @@ import tryMail from "./configs/mailer.config.js";
 
 // api endpoint
 
->>>>>>> master
 const app = express();
 
 app.use(express.json()); // Replace bodyParser with built-in JSON middleware
@@ -28,11 +24,8 @@ app.use(cors());
 const PORT = process.env.SERVER_PORT || 2173; // Define the port
 const SECRET_KEY = process.env.SECRET_KEY || "your-secret-key";
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> master
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   console.log("Incoming login request:", { email }); // Log request details
@@ -59,27 +52,15 @@ app.post("/api/login", async (req, res) => {
 
     // Step 3: Fetch permissions
     const rolePermissions = await RolePermission.findAll({
-<<<<<<< HEAD
-      where: { role_id: user.role }, // Match user's role
-      include: [{ model: Permission, attributes: ["name"] }],
-    });
-=======
       where: { role_id: user.role },
       include: [{ model: Permission, as: 'Permission', attributes: ["name"] }],
     });
     
->>>>>>> master
     console.log("Role permissions fetched:", rolePermissions); // Log permissions
 
     const permissions = rolePermissions.map((rp) => rp.Permission.name);
     console.log("Parsed permissions:", permissions); // Log parsed permissions
 
-<<<<<<< HEAD
-    // Step 4: Generate token
-    const username = `${user.firstName} ${user.lastName}`;
-    const token = jwt.sign(
-      { name: username, email: user.email, role: user.role, permissions },
-=======
     const roleName = await Role.findOne({
       where: { id: user.role },
       attributes: ['name'],  // assuming 'name' is the field holding the role name
@@ -92,7 +73,6 @@ app.post("/api/login", async (req, res) => {
     
     const token = jwt.sign(
       { username: username, email: user.email, role: roleName, permissions },
->>>>>>> master
       SECRET_KEY,
       { expiresIn: "1h" }
     );
@@ -106,12 +86,8 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post('/api/signup', async (req, res) => {
-<<<<<<< HEAD
-  const { firstName, lastName, email, role, password } = req.body;  
-=======
 
   const { firstName, lastName, email, role, password, userOrg } = req.body;  
->>>>>>> master
   console.log(`Signup form recieved at the backend ${req.body}`)
 
   try {
@@ -126,11 +102,6 @@ app.post('/api/signup', async (req, res) => {
       return res.status(400).json({ message: "Role not found" });
     }
 
-<<<<<<< HEAD
-    // Step 3: Get the role_id from the roleRecord
-    const role_id = roleRecord.id;
-
-=======
     // Step 3: Get the role_id from the roleRecord and identify the organization
     const role_id = roleRecord.id;
     const org = await Org.findOne({
@@ -142,19 +113,14 @@ app.post('/api/signup', async (req, res) => {
     
     const org_id = org ? org.id : null;
     
->>>>>>> master
     // Step 4: Create the user in the User model
     const newUser = await User.create({
       firstName,
       lastName,
       email,
       role: role_id, // Use the role_id
-<<<<<<< HEAD
-      password: hashedPassword // Store the hashed password
-=======
       password: hashedPassword, // Store the hashed password
       org_id : org_id
->>>>>>> master
     });
 
     res.status(201).json({
@@ -191,12 +157,8 @@ app.post('/api/tasks', async (req, res) => {
     console.log('User found:', user);
 
     // Fetch tasks assigned to the user
-<<<<<<< HEAD
-    const tasks = await Task.findAll({ where: { Assignedto: user.id } });
-=======
     const tasks = await Task.findAll({ where: { Assignedto: user.id,  org_id: user.org_id,
       completed: false } });
->>>>>>> master
 
     console.log('Tasks found:', tasks);
 
@@ -207,38 +169,6 @@ app.post('/api/tasks', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-
-app.post('/api/addTask', async (req,res)=>{
-  const { Assignee, Topic, Body, AssignedTo } = req.body;
-  console.log(req.body);
-  
-  try {
-      // Use await to properly retrieve users
-      let boss = await User.findOne({ where: { email: Assignee } });
-      let emp = await User.findOne({ where: { email: AssignedTo } });
-  
-      if (boss && emp) {
-          console.log("Users found");
-  
-          // Ensure column names match your model (Assignedto should match exactly)
-          await Task.create({
-              Body,
-              Topic,
-              Assignedto: emp.id,  // Ensure field matches model
-              Assignee: boss.id
-          });
-  
-          res.status(201).json({ message: "Task created successfully" });
-      } else {
-          res.status(404).json({ message: "One or both users not found" });
-      }
-  } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server error" });
-  }
-  })
-=======
 app.post('/api/addTask', async (req, res) => {
   const { Assignee, Topic, Body, AssignedTo, AssignedDate, DueDate } = req.body;
   console.log("Incoming task data:", req.body);
@@ -405,7 +335,6 @@ console.log("Could not get organizations ", error.e)
   });
   
       
->>>>>>> master
 // Start the server
 app.listen(PORT, () => {  
   console.log(`Server is running on http://localhost:${PORT}`);
