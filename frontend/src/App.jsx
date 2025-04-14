@@ -6,7 +6,7 @@ import Home from "../src/components/Home.jsx";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import AddTask from "./components/addTask.jsx";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./components/Dashboard.jsx";
 import CompletedTasks from "./components/completedTasks.jsx";
 import Profile from "./components/profile.jsx";
 import AssignedTasks from "./components/assignedTasks.jsx"; // The AssignedTasks component
