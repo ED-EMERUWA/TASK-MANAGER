@@ -158,7 +158,8 @@ app.post('/api/tasks', async (req, res) => {
 
     // Fetch tasks assigned to the user
     const tasks = await Task.findAll({ where: { Assignedto: user.id,  org_id: user.org_id,
-      completed: false } });
+      completed: false }, 
+      order: [['AssignedDate', 'DESC']] });
 
     console.log('Tasks found:', tasks);
 
