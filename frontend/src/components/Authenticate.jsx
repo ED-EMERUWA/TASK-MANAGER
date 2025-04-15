@@ -32,7 +32,7 @@ export const UserProvider = ({ children }) => {
           const userCred = JSON.parse(atob(tokenParts[1]));
 
           const userData = {
-            username: userCred.name,
+            username: userCred.username,
             role: userCred.role,
             email: userCred.email,
             permissions: Array.isArray(userCred.permissions)
@@ -115,8 +115,11 @@ export const UserProvider = ({ children }) => {
   setLoading(false);
 }, []);
 
+// const backend_url = "https://task-flow-backend-bc30.onrender.com"
+const backend_url = "http://localhost:2173/"
+
   return (
-    <UserContext.Provider value={{ user, login, logout, loading, signup }}>
+    <UserContext.Provider value={{ user, login, logout, loading, signup, backend_url }}>
       {children}
     </UserContext.Provider>
   );

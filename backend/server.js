@@ -306,7 +306,8 @@ console.log("Could not get organizations ", error.e)
         include: [
           { model: User, as: 'AssigneeDetails', attributes: ['id', 'firstName'] },
           { model: User, as: 'AssignedToDetails', attributes: ['id', 'firstName', 'lastName', ] }
-        ]
+        ],
+        order: [['CompletedDate', 'DESC']]
       
       });
   
