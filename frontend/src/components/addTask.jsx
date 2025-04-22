@@ -47,7 +47,7 @@ export default function AddTask() {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/getContacts", {
+        const response = await fetch("/api/getContacts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user?.email }),
