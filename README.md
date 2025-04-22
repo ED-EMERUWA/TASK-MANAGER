@@ -3,11 +3,16 @@ Here's a cleaned-up and more structured version of your markdown file, ensuring 
 ---
 
 # **TASK-MANAGER**  
-This repository contains all the necessary files and folders for **Ed Emeruwa's Task Manager**—a powerful and efficient task management application. It includes both **frontend** and **backend** components, ensuring a smooth user experience alongside robust server-side operations.  
+This repository contains all the necessary files and folders for **Ed Emeruwa's Task Flow**—a powerful and efficient task management application. It includes both **frontend** and **backend** components, ensuring a smooth user experience alongside robust server-side operations.  
 
 Additionally, the repository provides **Docker Compose configurations** and **Dockerfiles** for easy deployment and containerization. Each section of the project is designed with scalability, maintainability, and efficient development in mind, making it a comprehensive solution for task management.  
 
+## Visit Taskflows.org
+
+![image](https://github.com/user-attachments/assets/07470d4c-3acc-4ca6-b326-4423e93469bc)
+
 ---
+
 
 ## **Running the Application**  
 Follow these steps to set up and run the Task Manager locally:  
