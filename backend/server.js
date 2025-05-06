@@ -1,3 +1,4 @@
+
 import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -87,7 +88,7 @@ app.post("/api/login", async (req, res) => {
 
 app.post('/api/signup', async (req, res) => {
 
-  const { firstName, lastName, email, role, password, userOrg } = req.body;  
+  const { firstName, lastName, email, role, password, orgPassword } = req.body;  
   console.log(`Signup form recieved at the backend ${req.body}`)
 
   try {
@@ -105,7 +106,7 @@ app.post('/api/signup', async (req, res) => {
     // Step 3: Get the role_id from the roleRecord and identify the organization
     const role_id = roleRecord.id;
     const org = await Org.findOne({
-      where: { id: userOrg },
+      where: { password: orgPassword },
       attributes: ['id'], // Only fetch the `id`
     });
 
@@ -341,3 +342,39 @@ console.log("Could not get organizations ", error.e)
 app.listen(PORT, () => {  
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+
+
+
+
+// import express from 'express';
+// import cors from 'cors';
+// import dotenv from 'dotenv';
+// import sequelize from './configs/database.config.js';
+// import './models/association.js';
+
+// import authRoutes from './routes/auth.routes.js';
+// import taskRoutes from './routes/task.routes.js';
+// import userRoutes from './routes/user.routes.js';
+// import orgRoutes from './routes/org.routes.js';
+
+// dotenv.config();
+
+// const app = express();
+// app.use(cors());
+// app.use(express.json());
+
+// // Register Routes
+// app.use('/api', authRoutes);
+// app.use('/api', taskRoutes);
+// app.use('/api', userRoutes);
+// app.use('/api', orgRoutes);
+
+// const PORT = process.env.SERVER_PORT || 2173;
+// app.listen(PORT, () => {
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// });
+
+

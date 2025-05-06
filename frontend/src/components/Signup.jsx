@@ -22,7 +22,7 @@ export default function Signup() {
     email: "",
     role: "",
     password: "",
-    userOrg: "",
+    orgPassword: "",
   });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function Signup() {
   }, [signedIn, navigate]);
 
   const validateForm = () => {
-    const { firstName, lastName, password, role, userOrg } = formData;
+    const { firstName, lastName, password, role, orgPassword } = formData;
   
     if (firstName.trim().length < 2) {
       return "First name must be at least 2 characters.";
@@ -69,8 +69,8 @@ export default function Signup() {
     if (!role) {
       return "Please select a role.";
     }
-    if (!userOrg) {
-      return "Please select an organization.";
+    if (!formData.orgPassword) {
+      return "Please enter the organization passcode.";
     }
   
     return null;
@@ -188,7 +188,15 @@ export default function Signup() {
               <option value="admin">Admin</option>
             </select>
 
-            <select
+            <input
+  type="password"
+  placeholder="Organization Passcode"
+  value={formData.orgPassword}
+  onChange={(e) => setFormData({ ...formData, orgPassword: e.target.value })}
+  className="w-full px-4 py-3 bg-[#111111] border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1DCD9F] outline-none"
+/>
+
+            {/* <select
               value={formData.userOrg}
               onChange={(e) => setFormData({ ...formData, userOrg: e.target.value })}
               className="w-full px-4 py-3 bg-[#111111] border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-[#1DCD9F] outline-none"
@@ -199,7 +207,10 @@ export default function Signup() {
                   {org.name}
                 </option>
               ))}
-            </select>
+            </select> */}
+
+  
+
 
             <input
               type="password"

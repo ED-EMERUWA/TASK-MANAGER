@@ -124,9 +124,9 @@ CREATE TABLE IF NOT EXISTS `user_management_db`.`RolePermission` (
 ENGINE = InnoDB;
 
 -- Dummy Data for Org Table
-INSERT INTO `user_management_db`.`Org` (`id`, `name`) VALUES
-(1, 'Org A'),
-(2, 'Org B');
+INSERT INTO `user_management_db`.`Org` (`id`, `name`, `passcode`) VALUES
+(1, 'Org A', 'orgApass123'),
+(2, 'Org B', 'orgBpass456');
 
 -- Add Permissions
 INSERT INTO `user_management_db`.`Permission` (`id`, `name`) VALUES
