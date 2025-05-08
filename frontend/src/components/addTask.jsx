@@ -5,19 +5,8 @@ import { useAuth } from "./Authenticate.jsx";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowRight,
-  Calendar,
-  Users,
-  Menu,
-  X,
-  LogOut,
-  Layers,
-  User,
-  PlusCircle,
-  CheckSquare,
-  List
-} from "lucide-react";
+import { ArrowRight, Calendar, Users, Menu } from "lucide-react";
+import Sidebar from "./sidebar.jsx"; // Import the shared Sidebar
 
 export default function AddTask() {
   const { user, logout } = useAuth();
@@ -99,187 +88,125 @@ export default function AddTask() {
     }
   };
 
-  const menuItems = [
-    { name: "Dashboard", icon: <Layers size={18} />, path: "/dashboard" },
-    { name: "Profile", icon: <User size={18} />, path: "/profile" },
-    { name: "Add Task", icon: <PlusCircle size={18} />, path: "/add-task" },
-    { name: "Completed Tasks", icon: <CheckSquare size={18} />, path: "/completed" },
-    { name: "Assigned Tasks", icon: <List size={18} />, path: "/assigned-tasks" }
-  ];
-
-  const navigateAndCloseSidebar = (path) => {
-    navigate(path);
-    if (window.innerWidth < 768) {
-      setSidebarOpen(false);
-    }
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-[#3D3B40] text-[#F8EDFF] md:flex-row">
-      <header className="sticky top-0 z-20 bg-[#3D3B40] md:hidden flex items-center justify-between p-4 border-b border-[#525CEB]">
-        <h1 className="text-xl font-bold text-[#BFCFE7]">Task Flow</h1>
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-md bg-[#525CEB] hover:bg-[#3D3B40] text-white transition-colors"
-        >
-          <Menu size={24} />
-        </button>
-      </header>
+    <div className="flex flex-col min-h-screen bg-gray-900 text-white md:flex-row">
+     {/* Mobile header */}
+     <header className="sticky top-0 z-20 bg-gray-800 md:hidden flex items-center justify-between p-4 border-b border-gray-700">
+       <h1 className="text-xl font-bold">
+         <span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">Task Flow</span>
+       </h1>
+       <button
+         onClick={() => setSidebarOpen(!sidebarOpen)}
+         className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+       >
+         <Menu size={24} />
+       </button>
+     </header>
+   
+     {/* Sidebar */}
+     <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+   
+     {/* Backdrop for mobile */}
+     {sidebarOpen && (
+       <div
+         className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+         onClick={() => setSidebarOpen(false)}
+       ></div>
+     )}
 
-      <div className={`
-        fixed md:static inset-y-0 left-0 w-64 md:w-64 bg-[#3D3B40] border-r border-[#525CEB]
-        transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-        md:translate-x-0 transition-transform duration-300 ease-in-out
-        overflow-y-auto z-30 md:h-screen
-      `}>
-        <div className="hidden md:block p-6">
-          <h1 className="text-2xl font-bold text-[#BFCFE7]">Task Flow</h1>
-        </div>
+     {/* Main content */}
+<main className="flex-1 p-4 md:p-8 pt-4">
+  <div className="max-w-2xl mx-auto">
+    <div className="mb-6 md:mb-8">
+      <h2 className="text-2xl md:text-3xl font-bold mb-2 text-emerald-400">Create New Task</h2>
+      <p className="text-gray-300">Delegate tasks and track progress efficiently</p>
+    </div>
 
-        <div className="flex justify-end p-4 md:hidden">
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="p-2 rounded-md bg-[#525CEB] hover:bg-[#3D3B40] text-white transition-colors"
+    <div className="bg-gray-800 border border-teal-500 rounded-xl p-4 md:p-6 shadow-xl space-y-4 md:space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">Task Title</label>
+        <input
+          type="text"
+          placeholder="What needs to be done?"
+          value={newTask.Topic}
+          onChange={(e) => setNewTask({ ...newTask, Topic: e.target.value })}
+          className="w-full px-4 py-3 bg-gray-900 border border-teal-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">Task Description</label>
+        <textarea
+          placeholder="Add details about this task..."
+          value={newTask.Body}
+          onChange={(e) => setNewTask({ ...newTask, Body: e.target.value })}
+          rows={4}
+          className="w-full px-4 py-3 bg-gray-900 border border-teal-500 rounded-lg text-white resize-none placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">Assign To</label>
+        <div className="relative">
+          <select
+            value={newTask.AssignedTo}
+            onChange={(e) => setNewTask({ ...newTask, AssignedTo: e.target.value })}
+            className="w-full appearance-none px-4 py-3 bg-gray-900 border border-teal-500 rounded-lg text-white pr-10 focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="px-4 py-2">
-          <div className="bg-[#BFCFE7]/10 rounded-md p-3 mb-6">
-            <p className="text-sm text-[#BFCFE7]/70">Signed in as</p>
-            <p className="truncate font-medium text-[#F8EDFF]">{user?.email}</p>
-          </div>
-        </div>
-
-        <nav className="px-3 pb-10">
-          <ul className="space-y-1">
-            {menuItems.map((item) => (
-              <li key={item.path}>
-                <button
-                  onClick={() => navigateAndCloseSidebar(item.path)}
-                  className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-md transition-colors duration-200 ${
-                    item.path === "/add-task"
-                      ? "bg-[#525CEB]/30 text-[#F8EDFF]"
-                      : "hover:bg-[#525CEB]/20 text-[#BFCFE7]"
-                  }`}
-                >
-                  {item.icon}
-                  <span>{item.name}</span>
-                </button>
-              </li>
+            <option value="">Select Team Member</option>
+            {contacts.map((contact) => (
+              <option key={contact.id} value={contact.email}>
+                {contact.firstName} {contact.lastName} ({contact.email})
+              </option>
             ))}
-          </ul>
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#525CEB] bg-[#3D3B40]">
-          <button
-            onClick={logout}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-[#525CEB] hover:bg-[#3D3B40] text-white font-medium rounded-md transition duration-200"
-          >
-            <LogOut size={16} />
-            <span>Logout</span>
-          </button>
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+            <Users size={18} />
+          </div>
         </div>
       </div>
 
-      {sidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Assigned Date</label>
+          <input
+            type="date"
+            value={newTask.AssignedDate}
+            disabled
+            className="w-full px-4 py-3 bg-gray-900/60 border border-teal-500 rounded-lg text-gray-400 cursor-not-allowed"
+          />
+        </div>
 
-      <main className="flex-1 p-4 md:p-8 pt-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2 text-[#F8EDFF]">Create New Task</h2>
-            <p className="text-[#BFCFE7]">Delegate tasks and track progress efficiently</p>
-          </div>
-          <div className="bg-[#3D3B40] border border-[#525CEB] rounded-xl p-4 md:p-6 shadow-xl space-y-4 md:space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-[#BFCFE7] mb-1">Task Title</label>
-              <input
-                type="text"
-                placeholder="What needs to be done?"
-                value={newTask.Topic}
-                onChange={(e) => setNewTask({ ...newTask, Topic: e.target.value })}
-                className="w-full px-4 py-3 bg-[#3D3B40] border border-[#525CEB] rounded-lg text-[#F8EDFF] placeholder-[#BFCFE7] focus:outline-none focus:ring-2 focus:ring-[#525CEB]"
-              />
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Due Date & Time</label>
+          <div className="relative">
+            <DatePicker
+              selected={newTask.DueDate}
+              onChange={(date) => setNewTask({ ...newTask, DueDate: date })}
+              showTimeSelect
+              dateFormat="yyyy-MM-dd h:mm aa"
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              className="w-full px-4 py-3 bg-gray-900 border border-teal-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              placeholderText="Select deadline"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+              <Calendar size={18} />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#BFCFE7] mb-1">Task Description</label>
-              <textarea
-                placeholder="Add details about this task..."
-                value={newTask.Body}
-                onChange={(e) => setNewTask({ ...newTask, Body: e.target.value })}
-                rows={4}
-                className="w-full px-4 py-3 bg-[#3D3B40] border border-[#525CEB] rounded-lg text-[#F8EDFF] resize-none placeholder-[#BFCFE7] focus:outline-none focus:ring-2 focus:ring-[#525CEB]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#BFCFE7] mb-1">Assign To</label>
-              <div className="relative">
-                <select
-                  value={newTask.AssignedTo}
-                  onChange={(e) => setNewTask({ ...newTask, AssignedTo: e.target.value })}
-                  className="w-full appearance-none px-4 py-3 bg-[#3D3B40] border border-[#525CEB] rounded-lg text-[#F8EDFF] pr-10 focus:outline-none focus:ring-2 focus:ring-[#525CEB]"
-                >
-                  <option value="">Select Team Member</option>
-                  {contacts.map((contact) => (
-                    <option key={contact.id} value={contact.email}>
-                      {contact.firstName} {contact.lastName} ({contact.email})
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#BFCFE7]">
-                  <Users size={18} />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[#BFCFE7] mb-1">Assigned Date</label>
-                <input
-                  type="date"
-                  value={newTask.AssignedDate}
-                  disabled
-                  className="w-full px-4 py-3 bg-[#3D3B40]/60 border border-[#525CEB] rounded-lg text-[#BFCFE7] cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#BFCFE7] mb-1">Due Date & Time</label>
-                <div className="relative">
-                  <DatePicker
-                    selected={newTask.DueDate}
-                    onChange={(date) => setNewTask({ ...newTask, DueDate: date })}
-                    showTimeSelect
-                    dateFormat="yyyy-MM-dd h:mm aa"
-                    timeFormat="HH:mm"
-                    timeIntervals={15}
-                    className="w-full px-4 py-3 bg-[#3D3B40] border border-[#525CEB] rounded-lg text-[#F8EDFF] placeholder-[#BFCFE7] focus:outline-none focus:ring-2 focus:ring-[#525CEB]"
-                    placeholderText="Select deadline"
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#BFCFE7]">
-                    <Calendar size={18} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={addingTask}
-              className="w-full py-3 px-4 mt-4 bg-[#525CEB] hover:bg-[#3D3B40] text-white font-medium rounded-lg transition duration-200 flex items-center justify-center gap-2 shadow-lg"
-            >
-              Create Task <ArrowRight size={18} />
-            </button>
           </div>
         </div>
-      </main>
+      </div>
+
+      <button
+        onClick={addingTask}
+        className="w-full py-3 px-4 mt-4 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-lg transition duration-200 flex items-center justify-center gap-2 shadow-lg"
+      >
+        Create Task <ArrowRight size={18} />
+      </button>
+    </div>
+  </div>
+</main>
+
     </div>
   );
 }

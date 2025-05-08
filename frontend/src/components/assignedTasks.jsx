@@ -5,6 +5,7 @@ import {
   Menu, X, LogOut, Layers, User, PlusCircle, 
   CheckSquare, List 
 } from "lucide-react";
+import Sidebar from "./sidebar.jsx";
 
 export default function AssignedTasks() {
   const { user, logout } = useAuth();
@@ -66,70 +67,30 @@ export default function AssignedTasks() {
   if (error) return <p className="text-center mt-10 text-red-400 bg-gray-900 min-h-screen flex items-center justify-center">{error}</p>;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white md:flex-row">
+     <div className="flex flex-col min-h-screen bg-gray-900 text-white md:flex-row">
+      {/* Mobile header */}
       <header className="sticky top-0 z-20 bg-gray-800 md:hidden flex items-center justify-between p-4 border-b border-gray-700">
         <h1 className="text-xl font-bold">
           <span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">Task Flow</span>
         </h1>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+        >
           <Menu size={24} />
         </button>
       </header>
-
-      <div className={`fixed md:static inset-y-0 left-0 w-64 bg-gray-800 border-r border-gray-700 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto z-30 md:h-screen`}>
-        <div className="hidden md:block p-6">
-          <h1 className="text-2xl font-bold">
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">Task Flow</span>
-          </h1>
-        </div>
-
-        <div className="flex justify-end p-4 md:hidden">
-          <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="px-4 py-2">
-          <div className="bg-gray-700/50 rounded-md p-3 mb-6">
-            <p className="text-sm text-gray-400">Signed in as</p>
-            <p className="truncate font-medium">{user?.email}</p>
-          </div>
-        </div>
-
-        <nav className="px-3 pb-10">
-          <ul className="space-y-1">
-            {menuItems.map((item) => (
-              <li key={item.path}>
-                <button
-                  onClick={() => navigateAndCloseSidebar(item.path)}
-                  className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-md transition-colors duration-200 ${
-                    item.path === "/assigned-tasks"
-                      ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400"
-                      : "hover:bg-gray-700/70 text-gray-300"
-                  }`}
-                >
-                  {item.icon}
-                  <span>{item.name}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700 bg-gray-800">
-          <button
-            onClick={logout}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-md transition duration-200"
-          >
-            <LogOut size={16} />
-            <span>Logout</span>
-          </button>
-        </div>
-      </div>
-
+    
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+    
+      {/* Backdrop for mobile */}
       {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20" onClick={() => setSidebarOpen(false)}></div>
-      )}
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}            {/* Main Content */}
 
       <main className="flex-1 p-4 md:p-8 pt-4">
         <div className="max-w-4xl mx-auto">

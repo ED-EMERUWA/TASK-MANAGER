@@ -106,11 +106,11 @@ app.post('/api/signup', async (req, res) => {
     // Step 3: Get the role_id from the roleRecord and identify the organization
     const role_id = roleRecord.id;
     const org = await Org.findOne({
-      where: { password: orgPassword },
+      where: { passcode: orgPassword },
       attributes: ['id'], // Only fetch the `id`
     });
-
-    console.log("user org",userOrg)
+    console.log(orgPassword)
+    console.log("user org",org)
     
     const org_id = org ? org.id : null;
     

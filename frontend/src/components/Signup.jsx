@@ -33,6 +33,7 @@ export default function Signup() {
           throw new Error(`Failed to get organizations: ${response.status}`);
         }
         const data = await response.json();
+        console.log(data)
         setOrgs(data);
       } catch (err) {
         console.error("Error fetching orgs:", err);
@@ -219,6 +220,7 @@ export default function Signup() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="w-full px-4 py-3 bg-[#111111] border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-[#1DCD9F] outline-none"
             />
+           
 
 <input
   type="password"
@@ -251,6 +253,7 @@ export default function Signup() {
           </form>
         </div>
       </div>
+    
     </>
   );
 }
