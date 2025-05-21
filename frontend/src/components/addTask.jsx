@@ -11,6 +11,8 @@ import Sidebar from "./sidebar.jsx"; // Import the shared Sidebar
 export default function AddTask() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [newCriterion, setNewCriterion] = useState("");
+
 
   const [contacts, setContacts] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,7 +23,9 @@ export default function AddTask() {
     AssignedTo: "",
     AssignedDate: new Date().toISOString().slice(0, 10),
     DueDate: null,
+    CompletionCriteria: [], // Add this
   });
+  
 
   useEffect(() => {
     const handleResize = () => {
@@ -144,6 +148,55 @@ export default function AddTask() {
           className="w-full px-4 py-3 bg-gray-900 border border-teal-500 rounded-lg text-white resize-none placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
+
+      <div>
+  <label className="block text-sm font-medium text-gray-300 mb-1">Completion Criteria</label>
+  <div className="flex gap-2 mb-2">
+    <input
+      type="text"
+      placeholder="Add a criterion..."
+      value={newCriterion}
+      onChange={(e) => setNewCriterion(e.target.value)}
+      className="flex-1 px-4 py-2 bg-gray-900 border border-teal-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+    />
+    <button
+      type="button"
+      onClick={() => {
+        if (newCriterion.trim()) {
+          setNewTask((prev) => ({
+            ...prev,
+            CompletionCriteria: [...prev.CompletionCriteria, newCriterion.trim()],
+          }));
+          setNewCriterion("");
+        }
+      }}
+      className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition"
+    >
+      Add
+    </button>
+  </div>
+
+  <ul className="space-y-1">
+    {newTask.CompletionCriteria.map((criterion, index) => (
+      <li key={index} className="flex items-center justify-between bg-gray-700 px-4 py-2 rounded">
+        <span>{criterion}</span>
+        <button
+          type="button"
+          onClick={() =>
+            setNewTask((prev) => ({
+              ...prev,
+              CompletionCriteria: prev.CompletionCriteria.filter((_, i) => i !== index),
+            }))
+          }
+          className="text-red-400 hover:text-red-600"
+        >
+          Remove
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+
 
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1">Assign To</label>
