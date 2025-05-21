@@ -12,6 +12,7 @@ import "./models/association.js"
 import Task from "./models/Task.js";
 import Org from './models/Org.js'
 import tryMail from "./configs/mailer.config.js";
+import CompletionCriteria from "./models/CompletionCriteria.js";
 
 
 
@@ -172,7 +173,16 @@ app.post('/api/tasks', async (req, res) => {
 });
 
 app.post('/api/addTask', async (req, res) => {
-  const { Assignee, Topic, Body, AssignedTo, AssignedDate, DueDate } = req.body;
+  const {
+    Assignee,
+    Topic,
+    Body,
+    AssignedTo,
+    AssignedDate,
+    DueDate,
+    CompletionCriteria = [], // default to empty array
+  } = req.body;
+
   console.log("Incoming task data:", req.body);
 
   try {
@@ -184,8 +194,8 @@ app.post('/api/addTask', async (req, res) => {
       return res.status(404).json({ message: "Assignee or AssignedTo user not found" });
     }
 
-    // Create the task with the org_id from the Assignee (boss)
-    await Task.create({
+    // Create the task first
+    const newTask = await Task.create({
       Body,
       Topic,
       Assignee: boss.id,
@@ -195,13 +205,25 @@ app.post('/api/addTask', async (req, res) => {
       org_id: boss.org_id,
     });
 
-    res.status(201).json({ message: "Task created successfully" });
+    // Add completion criteria if provided
+    if (Array.isArray(CompletionCriteria) && CompletionCriteria.length > 0) {
+      const criteriaToCreate = CompletionCriteria.map((description) => ({
+        description,
+        task_id: newTask.id,
+      }));
+
+      await CompletionCriterion.bulkCreate(criteriaToCreate);
+    }
+
+    res.status(201).json({ message: "Task and criteria created successfully" });
 
   } catch (error) {
     console.error("Error adding task:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
   app.get('/api/orgs', async (req,res)=>{
     try{
       const fetchedOrg = await Org.findAll()

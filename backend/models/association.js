@@ -4,6 +4,8 @@ import User from "./User.js";
 import Permission from "./Permission.js";
 import Task from './Task.js';
 import Org from './Org.js';
+import CompletionCriteria from './CompletionCriteria.js';
+
 
 // ==== User & Role ====
 Role.hasMany(User, { 
@@ -93,6 +95,19 @@ Role.hasMany(RolePermission, {
   as: 'RolePermissions'
 });
 
+// ==== Task & CompletionCriteria ====
+Task.hasMany(CompletionCriteria, {
+  foreignKey: 'task_id',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+  as: 'Criteria'
+});
+CompletionCriteria.belongsTo(Task, {
+  foreignKey: 'task_id',
+  as: 'Task'
+});
+
+
 // ==== Export Models ====
 export default {
   Permission,
@@ -100,5 +115,6 @@ export default {
   User,
   Task,
   Role,
-  Org
+  Org,
+  CompletionCriteria
 };
