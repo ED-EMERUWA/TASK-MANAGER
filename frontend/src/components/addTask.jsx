@@ -65,7 +65,7 @@ export default function AddTask() {
         ...newTask,
         DueDate: newTask.DueDate ? toMySQLDatetime(newTask.DueDate) : null,
       };
-      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api//addTask", {
+      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/addTask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskToSend),
