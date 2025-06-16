@@ -125,6 +125,8 @@ app.post('/api/signup', async (req, res) => {
       org_id : org_id
     });
 
+  
+
     res.status(201).json({
       message: "User created successfully",
       user: {
@@ -145,30 +147,43 @@ app.post('/api/signup', async (req, res) => {
 
 app.post('/api/tasks', async (req, res) => {
   try {
-    const  userEmail  = req.body;
-    console.log('Request body:', req.body); // Better logging
-    console.log('Request body email :', userEmail); // Better logging
+    const userEmail = req.body;
+    console.log('Request body:', req.body);
+    console.log('Request body email :', userEmail);
 
     // Find user by email
     const user = await User.findOne({ where: { email: userEmail.email } });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' }); // Return a 404 if user doesn't exist
+      return res.status(404).json({ error: 'User not found' });
     }
 
     console.log('User found:', user);
 
-    // Fetch tasks assigned to the user
-    const tasks = await Task.findAll({ where: { Assignedto: user.id,  org_id: user.org_id,
-      completed: false }, 
-      order: [['AssignedDate', 'DESC']] });
-
+    // Fetch tasks assigned to the user and include their CompletionCriteria
+    const tasks = await Task.findAll({
+      where: {
+        Assignedto: user.id,
+        org_id: user.org_id,
+        completed: false,
+      },
+      include: [
+        {
+          model: CompletionCriteria,
+          as: 'Criteria', // <- match the alias exactly
+          required: false,
+          attributes: ['id', 'criteria_description', 'is_met'],
+        },
+      ],
+      order: [['AssignedDate', 'ASC']],
+    });
+    
     console.log('Tasks found:', tasks);
 
     res.json(tasks); // Send JSON response
   } catch (error) {
     console.error('Error fetching tasks:', error);
-    res.status(500).json({ error: 'Internal Server Error' }); // Handle server errors
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -180,8 +195,10 @@ app.post('/api/addTask', async (req, res) => {
     AssignedTo,
     AssignedDate,
     DueDate,
-    CompletionCriteria = [], // default to empty array
+    Criteria = [], // default to empty array
   } = req.body;
+
+  console.log(Criteria)
 
   console.log("Incoming task data:", req.body);
 
@@ -194,7 +211,7 @@ app.post('/api/addTask', async (req, res) => {
       return res.status(404).json({ message: "Assignee or AssignedTo user not found" });
     }
 
-    // Create the task first
+    // Create the task
     const newTask = await Task.create({
       Body,
       Topic,
@@ -205,14 +222,15 @@ app.post('/api/addTask', async (req, res) => {
       org_id: boss.org_id,
     });
 
-    // Add completion criteria if provided
-    if (Array.isArray(CompletionCriteria) && CompletionCriteria.length > 0) {
-      const criteriaToCreate = CompletionCriteria.map((description) => ({
-        description,
+    // Optionally create completion criteria
+    if (Array.isArray(Criteria) && Criteria.length > 0) {
+      const criteriaToCreate = Criteria.map((criteria_description) => ({
+        criteria_description,
         task_id: newTask.id,
       }));
 
-      await CompletionCriterion.bulkCreate(criteriaToCreate);
+      await CompletionCriteria.bulkCreate(criteriaToCreate);
+      console.log("Completion criteria created:", criteriaToCreate);
     }
 
     res.status(201).json({ message: "Task and criteria created successfully" });
@@ -239,8 +257,8 @@ console.log("Could not get organizations ", error.e)
 
   app.put('/api/updatetasks', async (req, res) => {
     const { email, task_id, completedNote } = req.body;
-  
-    if (!task_id || completedNote === undefined) {
+    console.log(req.body)
+    if (!task_id ) {
       return res.status(400).json({ error: 'Missing task_id or completedNote' });
     }
   
@@ -358,6 +376,143 @@ console.log("Could not get organizations ", error.e)
       res.status(500).json({ message: "Internal server error." });
     }
   });
+
+  // Update individual criteria endpoint
+app.put('/api/update-criteria', async (req, res) => {
+  const { email, criteria_id, is_met } = req.body;
+
+  try {
+    // Find user first to verify permissions
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Find the criteria and verify it belongs to a task assigned to this user
+    const criteria = await CompletionCriteria.findOne({
+      where: { id: criteria_id },
+      include: [{
+        model: Task,
+        as: 'Task',
+        where: { AssignedTo: user.id }
+      }]
+    });
+
+    if (!criteria) {
+      return res.status(404).json({ message: "Criteria not found or not authorized" });
+    }
+
+    // Update the criteria
+    await criteria.update({ is_met: !is_met });
+
+    res.json({ 
+      message: "Criteria updated successfully",
+      criteria: {
+        id: criteria.id,
+        criteria_description: criteria.criteria_description,
+        is_met: criteria.is_met
+      }
+    });
+
+  } catch (error) {
+    console.error("Error updating criteria:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Batch update multiple criteria (optional - for efficiency)
+app.put('/api/update-criteria-batch', async (req, res) => {
+  const { email, updates } = req.body; // updates: [{ criteria_id, is_met }, ...]
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Validate all criteria belong to user's tasks
+    const criteriaIds = updates.map(update => update.criteria_id);
+    
+    const userCriteria = await CompletionCriteria.findAll({
+      where: { id: criteriaIds },
+      include: [{
+        model: Task,
+        as: 'Task',
+        where: { AssignedTo: user.id }
+      }]
+    });
+
+    if (userCriteria.length !== criteriaIds.length) {
+      return res.status(403).json({ message: "Some criteria not found or not authorized" });
+    }
+
+    // Perform batch update
+    const updatePromises = updates.map(update => 
+      CompletionCriteria.update(
+        { is_met: update.is_met },
+        { where: { id: update.criteria_id } }
+      )
+    );
+
+    await Promise.all(updatePromises);
+
+    // Return updated criteria
+    const updatedCriteria = await CompletionCriteria.findAll({
+      where: { id: criteriaIds },
+      attributes: ['id', 'criteria_description', 'is_met']
+    });
+
+    res.json({ 
+      message: "Criteria updated successfully",
+      updated_count: updates.length,
+      criteria: updatedCriteria
+    });
+
+  } catch (error) {
+    console.error("Error batch updating criteria:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Get task progress (optional endpoint for progress calculation)
+app.post('/api/task-progress', async (req, res) => {
+  const { email, task_id } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const task = await Task.findOne({
+      where: { 
+        id: task_id,
+        AssignedTo: user.id 
+      },
+      include: [{
+        model: CompletionCriteria,
+        attributes: ['id', 'criteria_description', 'is_met']
+      }]
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found or not authorized" });
+    }
+
+    const totalCriteria = task.CompletionCriteria.length;
+    const completedCriteria = task.CompletionCriteria.filter(c => c.is_met).length;
+    const progress = totalCriteria > 0 ? Math.round((completedCriteria / totalCriteria) * 100) : 0;
+
+    res.json({
+      task_id: task.id,
+      total_criteria: totalCriteria,
+      completed_criteria: completedCriteria,
+      progress_percentage: progress,
+      criteria: task.CompletionCriteria
+    });
+
+  } catch (error) {
+    console.error("Error fetching task progress:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
   
       
 // Start the server

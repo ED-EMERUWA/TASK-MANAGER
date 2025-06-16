@@ -23,7 +23,7 @@ export default function AddTask() {
     AssignedTo: "",
     AssignedDate: new Date().toISOString().slice(0, 10),
     DueDate: null,
-    CompletionCriteria: [], // Add this
+    Criteria: [], // Add this
   });
   
 
@@ -65,7 +65,7 @@ export default function AddTask() {
         ...newTask,
         DueDate: newTask.DueDate ? toMySQLDatetime(newTask.DueDate) : null,
       };
-      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/addTask", {
+      const response = await fetch("http://localhost:2173/api/addTask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskToSend),
@@ -165,7 +165,7 @@ export default function AddTask() {
         if (newCriterion.trim()) {
           setNewTask((prev) => ({
             ...prev,
-            CompletionCriteria: [...prev.CompletionCriteria, newCriterion.trim()],
+            Criteria: [...prev.Criteria, newCriterion.trim()],
           }));
           setNewCriterion("");
         }
@@ -177,7 +177,7 @@ export default function AddTask() {
   </div>
 
   <ul className="space-y-1">
-    {newTask.CompletionCriteria.map((criterion, index) => (
+    {newTask.Criteria.map((criterion, index) => (
       <li key={index} className="flex items-center justify-between bg-gray-700 px-4 py-2 rounded">
         <span>{criterion}</span>
         <button
@@ -185,7 +185,7 @@ export default function AddTask() {
           onClick={() =>
             setNewTask((prev) => ({
               ...prev,
-              CompletionCriteria: prev.CompletionCriteria.filter((_, i) => i !== index),
+              Criteria: prev.Criteria.filter((_, i) => i !== index),
             }))
           }
           className="text-red-400 hover:text-red-600"

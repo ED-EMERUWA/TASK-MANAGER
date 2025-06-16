@@ -14,13 +14,14 @@ export default function Dashboard() {
   const [completedNotes, setCompletedNotes] = useState({});
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingCriteriaUpdates, setPendingCriteriaUpdates] = useState({}); // Track pending updates
   const navigate = useNavigate();
 
   const fetchTasks = useCallback(async () => {
     if (!user) return;
 
     try {
-      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/tasks", {
+      const response = await fetch("http://localhost:2173/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email }),
@@ -29,10 +30,86 @@ export default function Dashboard() {
       if (!response.ok) throw new Error(`Failed to fetch tasks: ${response.status}`);
       const data = await response.json();
       setTasks(data);
+      console.log("ed ovr here from server", data)
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
-  });
+    // remove this for otinoimous loading
+  }, []);
+
+  // Calculate progress percentage for a task
+  const calculateProgress = (criteria) => {
+    if (!criteria || criteria.length === 0) return 0;
+    const metCount = criteria.filter(c => c.is_met).length;
+    return Math.round((metCount / criteria.length) * 100);
+  };
+
+  // Toggle criteria completion locally
+  const toggleCriteria = (taskId, criteriaId) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => {
+        if (task.id === taskId) {
+          const updatedCriteria = task.Criteria.map(criteria => {
+            if (criteria.id === criteriaId) {
+              return { ...criteria, is_met: !criteria.is_met };
+            }
+            return criteria;
+          });
+          return { ...task, Criteria: updatedCriteria };
+        }
+        return task;
+      })
+    );
+
+    // Track this update for batch processing
+    setPendingCriteriaUpdates(prev => ({
+      ...prev,
+      [`${taskId}-${criteriaId}`]: Date.now()
+    }));
+
+    // Debounce the server update
+    debouncedUpdateCriteria(taskId, criteriaId);
+  };
+
+  // Debounced function to update criteria on server
+  const debouncedUpdateCriteria = useCallback(
+    debounce(async (taskId, criteriaId) => {
+      try {
+        // Get the current state of the criteria
+        const task = tasks.find(t => t.id === taskId);
+        const criteria = task?.Criteria.find(c => c.id === criteriaId);
+        
+        if (!criteria) return;
+
+        const response = await fetch("http://localhost:2173/api/update-criteria", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.email,
+            criteria_id: criteriaId,
+            is_met: criteria.is_met
+          }),
+        });
+        const crit_response =  await response.json()
+        console.log(crit_response)
+
+        if (!response.ok) throw new Error(`Failed to update criteria: ${response.status}`);
+        
+        // Remove from pending updates
+        setPendingCriteriaUpdates(prev => {
+          const newPending = { ...prev };
+          delete newPending[`${taskId}-${criteriaId}`];
+          return newPending;
+        });
+
+      } catch (error) {
+        console.error("Error updating criteria:", error);
+        // Optionally revert the local change on error
+        // You could add error handling here to revert the UI state
+      }
+    }, 1000),
+    [tasks, user]
+  );
 
   useEffect(() => {
     if (loading) return;
@@ -64,7 +141,7 @@ export default function Dashboard() {
 
   const handleComplete = async (taskId, note) => {
     try {
-      const response = await fetch("https://task-flow-backend-bc30.onrender.com/api/updatetasks", {
+      const response = await fetch(" http://localhost:2173/api/updatetasks", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -95,9 +172,6 @@ export default function Dashboard() {
       return;
     }
 
-    const confirmDelete = window.confirm("Are you sure you want to delete this task?");
-    if (!confirmDelete) return;
-  
     try {
       const res = await fetch(`https://task-flow-backend-bc30.onrender.com/api/delete`, {
         method: "DELETE",
@@ -106,9 +180,9 @@ export default function Dashboard() {
         },
         body: JSON.stringify({ id: taskId }),
       });
-  
+
       if (res.ok) {
-        setCompletedTasks(prev => prev.filter(task => task.id !== taskId));
+        setTasks(prev => prev.filter(task => task.id !== taskId));
       } else {
         console.error("Failed to delete task");
       }
@@ -138,29 +212,29 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-white md:flex-row">
-  {/* Mobile header */}
-  <header className="sticky top-0 z-20 bg-gray-800 md:hidden flex items-center justify-between p-4 border-b border-gray-700">
-    <h1 className="text-xl font-bold">
-      <span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">Task Flow</span>
-    </h1>
-    <button
-      onClick={() => setSidebarOpen(!sidebarOpen)}
-      className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition-colors"
-    >
-      <Menu size={24} />
-    </button>
-  </header>
+      {/* Mobile header */}
+      <header className="sticky top-0 z-20 bg-gray-800 md:hidden flex items-center justify-between p-4 border-b border-gray-700">
+        <h1 className="text-xl font-bold">
+          <span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">Task Flow</span>
+        </h1>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+      </header>
 
-  {/* Sidebar */}
-  <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      {/* Sidebar */}
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-  {/* Backdrop for mobile */}
-  {sidebarOpen && (
-    <div
-      className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
-      onClick={() => setSidebarOpen(false)}
-    ></div>
-  )}
+      {/* Backdrop for mobile */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
  
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-8 pt-4">
@@ -201,6 +275,7 @@ export default function Dashboard() {
                   const assignedDate = new Date(task.AssignedDate);
                   const isPastDue = dueDate < new Date();
                   const isOpen = openTaskIds.includes(task.id);
+                  const progress = calculateProgress(task.Criteria);
 
                   return (
                     <li
@@ -214,6 +289,22 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <h2 className="text-lg md:text-xl font-semibold text-white mb-1">{task.Topic}</h2>
                           <p className="text-sm text-gray-400 line-clamp-1">{task.Body}</p>
+                          
+                          {/* Progress bar in collapsed view */}
+                          {task.Criteria && task.Criteria.length > 0 && (
+                            <div className="mt-3">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs text-gray-400">Progress</span>
+                                <span className="text-xs font-medium text-emerald-400">{progress}%</span>
+                              </div>
+                              <div className="w-full bg-gray-600 rounded-full h-2">
+                                <div 
+                                  className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-500 ease-out"
+                                  style={{ width: `${progress}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
@@ -244,6 +335,66 @@ export default function Dashboard() {
                       {isOpen && (
                         <div className="p-4 pt-0 border-t border-gray-700 mt-2" onClick={(e) => e.stopPropagation()}>
                           <p className="text-gray-300 mb-4 p-3 bg-gray-800 rounded-lg">{task.Body}</p>
+                          
+                          {/* Criteria section */}
+                          {task.Criteria && task.Criteria.length > 0 && (
+                            <div className="mb-6">
+                              <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-white">Task Criteria</h3>
+                                <div className="text-sm font-medium text-emerald-400">
+                                  {task.Criteria.filter(c => c.is_met).length} of {task.Criteria.length} completed
+                                </div>
+                              </div>
+                              
+                              {/* Full progress bar in expanded view */}
+                              <div className="mb-4">
+                                <div className="w-full bg-gray-600 rounded-full h-3">
+                                  <div 
+                                    className="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full transition-all duration-500 ease-out relative"
+                                    style={{ width: `${progress}%` }}
+                                  >
+                                    <div className="absolute right-2 top-0 h-full flex items-center">
+                                      <span className="text-xs font-bold text-white">{progress}%</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Criteria list */}
+                              <div className="space-y-2">
+                                {task.Criteria.map((criteria) => (
+                                  <div 
+                                    key={criteria.id}
+                                    className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
+                                  >
+                                    <button
+                                      onClick={() => toggleCriteria(task.id, criteria.id)}
+                                      className={`flex-shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 ${
+                                        criteria.is_met 
+                                          ? 'bg-emerald-500 border-emerald-500' 
+                                          : 'border-gray-400 hover:border-emerald-400'
+                                      }`}
+                                    >
+                                      {criteria.is_met && (
+                                        <CheckSquare size={16} className="text-white m-0.5" />
+                                      )}
+                                    </button>
+                                    <span className={`flex-1 ${
+                                      criteria.is_met 
+                                        ? 'text-gray-300 line-through' 
+                                        : 'text-white'
+                                    }`}>
+                                      {criteria.criteria_description}
+                                    </span>
+                                    {pendingCriteriaUpdates[`${task.id}-${criteria.id}`] && (
+                                      <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
                           <div className="space-y-3">
                             <textarea
                               placeholder="Add a completion note..."
@@ -277,4 +428,17 @@ export default function Dashboard() {
       </main>
     </div>
   );
+}
+
+// Debounce utility function
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }

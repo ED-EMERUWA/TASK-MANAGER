@@ -24,7 +24,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
     admin: [
     { name: "Assigned Tasks", icon: <List size={18} />, path: "/assigned-tasks" },
       { name: "Add Task", icon: <PlusCircle size={18} />, path: "/add-task" },
-      { name: "Completed Tasks", icon: <CheckSquare size={18} />, path: "/completed" }
+      { name: "Completed Tasks", icon: <CheckSquare size={18} />, path: "/completed" } 
     ],
     teacher: [
      
